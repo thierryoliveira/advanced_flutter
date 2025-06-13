@@ -1,0 +1,16 @@
+# Next Event
+- Get the event data (group name, event date and a list of players)
+- Players that are NOT confirmed must be shown in alphabetical order
+- Players that are confirmed must be shown sorted by the corfirmation date/time
+- Split confirmed and NOT confirmed players
+- Group confirmed players by field positions
+
+# Player
+- Each player has: name, picture, position, confirmation status, and confirmation date
+- If the player doesn't have a picture, his initials are gonna be shown in the picture's place
+- The initials rule is that is must be always the initials for first and last name
+- In case there isn't a last name, the two first chars from the name are gonna be shown
+- In case the name has only a char, just show it 
+- In case the name is empty, show a hyphen (-) as the name initials
+- Trim the whitespaces from the name
+- Name initials always lowercased
