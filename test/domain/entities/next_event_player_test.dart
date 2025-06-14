@@ -38,8 +38,8 @@ class NextEventPlayer {
 
   static String _getInitials(String name) {
     final names = name.split(' ');
-    final firstNameInitial = names.first[0];
-    final lastNameInitial = names.last[0];
+    final firstNameInitial = names.first[0].toUpperCase();
+    final lastNameInitial = names.last[names.length == 1 ? 1 : 0].toUpperCase();
     return '$firstNameInitial$lastNameInitial';
   }
 }
@@ -52,5 +52,14 @@ void main() {
     expect(initialsOf('Thierry Oliveira'), 'TO');
     expect(initialsOf('Lorem Ipsum'), 'LI');
     expect(initialsOf('Rogerio Mucki Ceni'), 'RC');
+  });
+
+  test('should return the first two letters in case there is only a name', () {
+    expect(initialsOf('Thierry'), 'TH');
+  });
+
+  test('should convert to uppercase', () {
+    expect(initialsOf('thierry oliveira'), 'TO');
+    expect(initialsOf('thierry'), 'TH');
   });
 }
