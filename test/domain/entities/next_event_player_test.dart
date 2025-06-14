@@ -37,9 +37,9 @@ class NextEventPlayer {
   );
 
   static String _getInitials(String name) {
-    if (name.isEmpty) return '-';
+    if (name.trim().isEmpty) return '-';
 
-    final names = name.split(' ');
+    final names = name.trim().split(' ');
     final firstChar = names.first[0];
     final lastChar =
         names.last.split('').elementAtOrNull(names.length == 1 ? 1 : 0) ?? '';
@@ -73,5 +73,13 @@ void main() {
   test('should convert to uppercase', () {
     expect(initialsOf('thierry oliveira'), 'TO');
     expect(initialsOf('thierry'), 'TH');
+  });
+
+  test('should ignore extra whitespaces', () {
+    expect(initialsOf('Thierry Oliveira '), 'TO');
+    expect(initialsOf(' Thierry    Oliveira '), 'TO');
+    expect(initialsOf('  thierry  '), 'TH');
+    expect(initialsOf('  t  '), 'T');
+    expect(initialsOf(' '), '-');
   });
 }
