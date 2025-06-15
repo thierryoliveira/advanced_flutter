@@ -30,7 +30,7 @@ class NextEvent {
   });
 }
 
-class LoadNextEventMockRepository implements LoadNextEventRepository {
+class LoadNextEventSpyRepository implements LoadNextEventRepository {
   String? groupId;
   NextEvent? output;
 
@@ -42,13 +42,13 @@ class LoadNextEventMockRepository implements LoadNextEventRepository {
 }
 
 void main() {
-  late LoadNextEventMockRepository repository;
+  late LoadNextEventSpyRepository repository;
   late LoadNextEventUseCase sut;
   late String groupId;
 
   setUp(() {
     groupId = Random().nextInt(50000).toString();
-    repository = LoadNextEventMockRepository();
+    repository = LoadNextEventSpyRepository();
 
     repository.output = NextEvent(
       groupName: 'any group name',
