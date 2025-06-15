@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:advanced_flutter/domain/entities/next_event_player.dart';
 
+import '../repositories/load_next_event_repository.dart';
+
 class LoadNextEventUseCase {
   final LoadNextEventRepository loadNextEventRepository;
 
@@ -13,10 +15,6 @@ class LoadNextEventUseCase {
   Future<NextEvent> call({required String groupId}) async {
     return loadNextEventRepository.loadNextEvent(groupId: groupId);
   }
-}
-
-abstract class LoadNextEventRepository {
-  Future<NextEvent> loadNextEvent({required String groupId});
 }
 
 class LoadNextEventSpyRepository implements LoadNextEventRepository {
