@@ -33,10 +33,12 @@ class NextEvent {
 class LoadNextEventSpyRepository implements LoadNextEventRepository {
   String? groupId;
   NextEvent? output;
+  Error? error;
 
   @override
   Future<NextEvent> loadNextEvent({required String groupId}) async {
     this.groupId = groupId;
+    if (error != null) throw error!;
     return output!;
   }
 }
@@ -108,5 +110,12 @@ void main() {
       event.players[1].confirmationDate,
       repository.output?.players[1].confirmationDate,
     );
+  });
+
+  test('should rethrow on error', () async {
+    final error = Error();
+    repository.error = error;
+    final future = sut(groupId: groupId);
+    expect(future, throwsA(error));
   });
 }
