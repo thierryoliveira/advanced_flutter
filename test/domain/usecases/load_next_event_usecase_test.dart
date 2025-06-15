@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:advanced_flutter/domain/entities/next_event.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:advanced_flutter/domain/entities/next_event_player.dart';
@@ -16,18 +17,6 @@ class LoadNextEventUseCase {
 
 abstract class LoadNextEventRepository {
   Future<NextEvent> loadNextEvent({required String groupId});
-}
-
-class NextEvent {
-  final String groupName;
-  final DateTime date;
-  final List<NextEventPlayer> players;
-
-  NextEvent({
-    required this.groupName,
-    required this.date,
-    required this.players,
-  });
 }
 
 class LoadNextEventSpyRepository implements LoadNextEventRepository {
