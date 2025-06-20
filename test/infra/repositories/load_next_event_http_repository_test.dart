@@ -1,18 +1,9 @@
+import 'package:advanced_flutter/infra/repositories/load_next_event_http_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../helpers/fakes.dart';
-
-class LoadNextEventHttpRepository {
-  final Client client;
-
-  LoadNextEventHttpRepository({required this.client});
-
-  Future<Future<Response>> loadNextEvent({required String groupId}) async {
-    return client.get(Uri());
-  }
-}
 
 class HttpClientSpy extends Mock implements Client {}
 
