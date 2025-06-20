@@ -6,6 +6,8 @@ import 'package:advanced_flutter/domain/repositories/load_next_event_repository.
 import 'package:advanced_flutter/domain/usecases/load_next_event_usecase.dart';
 import 'package:advanced_flutter/domain/entities/next_event_player.dart';
 
+import '../../helpers/fakes.dart';
+
 class LoadNextEventSpyRepository implements LoadNextEventRepository {
   String? groupId;
   NextEvent? output;
@@ -25,7 +27,7 @@ void main() {
   late String groupId;
 
   setUp(() {
-    groupId = Random().nextInt(50000).toString();
+    groupId = anyString();
     repository = LoadNextEventSpyRepository();
 
     repository.output = NextEvent(
