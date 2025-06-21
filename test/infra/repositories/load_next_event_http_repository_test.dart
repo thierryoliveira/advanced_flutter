@@ -9,27 +9,27 @@ class HttpClientSpy extends Mock implements Client {}
 
 void main() {
   late Client httpClient;
+  late String groupId;
+  const url = 'https://domain.com/api/groups/:groupId/next_event';
 
   setUp(() {
     httpClient = HttpClientSpy();
     registerFallbackValue(Uri());
+    groupId = anyString();
 
     when(
-      () => httpClient.get(any()),
+      () => httpClient.get(any(), headers: any(named: 'headers')),
     ).thenAnswer((_) async => Response('', 200));
   });
 
   test('should request with the correct method', () async {
-    final groupId = anyString();
-    final sut = LoadNextEventHttpRepository(client: httpClient, url: '');
+    final sut = LoadNextEventHttpRepository(client: httpClient, url: url);
     await sut.loadNextEvent(groupId: groupId);
 
     verify(() => httpClient.get(any())).called(1);
   });
 
   test('should request with the correct URL', () async {
-    final groupId = anyString();
-    final url = 'https://domain.com/api/groups/:groupId/next_event';
     final sut = LoadNextEventHttpRepository(client: httpClient, url: url);
     await sut.loadNextEvent(groupId: groupId);
 
@@ -38,5 +38,20 @@ void main() {
         Uri.parse('https://domain.com/api/groups/$groupId/next_event'),
       ),
     ).called(1);
+  });
+
+  test('should request with the correct headers', () async {
+    final headers = <String, String>{
+      'content-type': 'application/json',
+      'accept': 'application/json',
+    };
+    final sut = LoadNextEventHttpRepository(
+      client: httpClient,
+      url: url,
+      headers: headers,
+    );
+    await sut.loadNextEvent(groupId: groupId);
+
+    verify(() => httpClient.get(any(), headers: headers)).called(1);
   });
 }
