@@ -1,16 +1,39 @@
-# advanced_flutter
+# Advanced Flutter - Clean Architecture & TDD Practice
 
-A new Flutter project.
+This repository contains my learning journey through the [Advanced Flutter Course: Clean Architecture & TDD](https://hotmart.com/pt-br/marketplace/produtos/flutter-avancado-com-clean-architecture-e-tdd/F89451665S). The goal is to level up my Flutter skills and apply best practices to build scalable, testable, and maintainable mobile apps.
 
-## Getting Started
+## 🚀 What I'm Learning
 
-This project is a starting point for a Flutter application.
+- **Modern Software Architecture**  
+  Applying **Clean Architecture** with clear layer separation, low coupling, and high cohesion.
 
-A few resources to get you started if this is your first Flutter project:
+- **Test-Driven Development (TDD)**  
+  Building features driven by tests: unit, integration, and widget tests with real coverage.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **SOLID Principles & Best Practices**  
+  Writing flexible, testable, and long-lasting code.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Caching Strategies**  
+  Implementing professional local persistence techniques.
+
+- **Design Patterns**  
+  Practical usage of patterns like **Factory**, **Adapter**, **Composite**, **Decorator**, and more.
+
+- **Advanced Object-Oriented Programming (OOP)**  
+  Mastering concepts like inheritance, composition, immutability, encapsulation, and polymorphism.
+
+- **API Integrations**  
+  Handling data fetching and communication with external services.
+
+- **Advanced Flutter & Dart**  
+  Going beyond the basics to write clean and efficient Dart and Flutter code.
+
+## 📚 Foundations
+
+The course is inspired by core software engineering books:
+- *Clean Code* - Robert C. Martin  
+- *Clean Architecture* - Robert C. Martin  
+- *The Clean Coder* - Robert C. Martin  
+- *Refactoring* - Martin Fowler  
+- *Design Patterns* - GoF  
+- *Dependency Injection in .NET* - Mark Seemann (adapted for Flutter)
