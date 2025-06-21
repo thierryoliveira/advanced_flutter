@@ -21,9 +21,22 @@ void main() {
 
   test('should request with the correct method', () async {
     final groupId = anyString();
-    final sut = LoadNextEventHttpRepository(client: httpClient);
+    final sut = LoadNextEventHttpRepository(client: httpClient, url: '');
     await sut.loadNextEvent(groupId: groupId);
 
     verify(() => httpClient.get(any())).called(1);
+  });
+
+  test('should request with the correct URL', () async {
+    final groupId = anyString();
+    final url = 'https://domain.com/api/groups/:groupId/next_event';
+    final sut = LoadNextEventHttpRepository(client: httpClient, url: url);
+    await sut.loadNextEvent(groupId: groupId);
+
+    verify(
+      () => httpClient.get(
+        Uri.parse('https://domain.com/api/groups/$groupId/next_event'),
+      ),
+    ).called(1);
   });
 }
