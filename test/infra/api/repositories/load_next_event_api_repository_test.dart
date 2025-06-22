@@ -13,7 +13,7 @@ class LoadNextEventApiRepository implements LoadNextEventRepository {
 
   @override
   Future<NextEvent> loadNextEvent({required String groupId}) async {
-    final eventMap = await httpClient.get(
+    final eventMap = await httpClient.get<Map<String, dynamic>>(
       url: url,
       params: {'groupId': groupId},
     );
@@ -22,7 +22,7 @@ class LoadNextEventApiRepository implements LoadNextEventRepository {
 }
 
 abstract class HttpGetClient {
-  Future<dynamic> get({required String url, Map<String, String>? params});
+  Future<T> get<T>({required String url, Map<String, String>? params});
 }
 
 class HttpGetClientSpy extends Mock implements HttpGetClient {}
@@ -54,8 +54,10 @@ void main() {
     httpClient = HttpGetClientSpy();
     sut = LoadNextEventApiRepository(httpClient: httpClient, url: url);
     when(
-      () =>
-          httpClient.get(url: any(named: 'url'), params: any(named: 'params')),
+      () => httpClient.get<Map<String, dynamic>>(
+        url: any(named: 'url'),
+        params: any(named: 'params'),
+      ),
     ).thenAnswer((_) async => successMap);
   });
 
@@ -63,7 +65,10 @@ void main() {
     await sut.loadNextEvent(groupId: groupId);
 
     verify(
-      () => httpClient.get(url: url, params: any(named: 'params')),
+      () => httpClient.get<Map<String, dynamic>>(
+        url: url,
+        params: any(named: 'params'),
+      ),
     ).called(1);
   });
 
@@ -71,7 +76,10 @@ void main() {
     await sut.loadNextEvent(groupId: groupId);
 
     verify(
-      () => httpClient.get(url: url, params: {'groupId': groupId}),
+      () => httpClient.get<Map<String, dynamic>>(
+        url: url,
+        params: {'groupId': groupId},
+      ),
     ).called(1);
   });
 
@@ -99,7 +107,10 @@ void main() {
   test('should rethrow on error', () {
     final error = Error();
     when(
-      () => httpClient.get(url: url, params: any(named: 'params')),
+      () => httpClient.get<Map<String, dynamic>>(
+        url: url,
+        params: any(named: 'params'),
+      ),
     ).thenThrow(error);
 
     final future = sut.loadNextEvent(groupId: groupId);
