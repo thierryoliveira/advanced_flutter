@@ -1,16 +1,7 @@
+import 'package:advanced_flutter/domain/entities/domain_error.dart';
 import 'package:advanced_flutter/domain/entities/next_event.dart';
 import 'package:advanced_flutter/domain/repositories/load_next_event_repository.dart';
 import 'package:http/http.dart';
-
-enum DomainError {
-  unexpected,
-  sessionExpired;
-
-  factory DomainError.fromStatusCode(int statusCode) {
-    if (statusCode == 401) return DomainError.sessionExpired;
-    return DomainError.unexpected;
-  }
-}
 
 class LoadNextEventHttpRepository implements LoadNextEventRepository {
   final Client client;

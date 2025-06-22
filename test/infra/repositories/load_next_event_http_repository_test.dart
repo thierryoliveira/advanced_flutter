@@ -1,3 +1,4 @@
+import 'package:advanced_flutter/domain/entities/domain_error.dart';
 import 'package:advanced_flutter/infra/repositories/load_next_event_http_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
