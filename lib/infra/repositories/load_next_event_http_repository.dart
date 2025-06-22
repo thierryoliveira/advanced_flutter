@@ -20,7 +20,10 @@ class LoadNextEventHttpRepository implements LoadNextEventRepository {
     final urlWithParams = url.replaceFirst(':groupId', groupId);
     final result = await client.get(Uri.parse(urlWithParams), headers: headers);
 
-    if (result.statusCode == 400 || result.statusCode == 403) {
+    if (result.statusCode == 400 ||
+        result.statusCode == 403 ||
+        result.statusCode == 404 ||
+        result.statusCode == 500) {
       throw DomainError.unexpected;
     }
 

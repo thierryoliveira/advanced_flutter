@@ -116,4 +116,18 @@ void main() {
 
     expect(future, throwsA(DomainError.unexpected));
   });
+
+  test('should throw UnexpectedError on 404', () async {
+    mockHttpClient().thenAnswer((_) async => Response('', 404));
+    final future = sut.loadNextEvent(groupId: groupId);
+
+    expect(future, throwsA(DomainError.unexpected));
+  });
+
+  test('should throw UnexpectedError on 500', () async {
+    mockHttpClient().thenAnswer((_) async => Response('', 500));
+    final future = sut.loadNextEvent(groupId: groupId);
+
+    expect(future, throwsA(DomainError.unexpected));
+  });
 }
