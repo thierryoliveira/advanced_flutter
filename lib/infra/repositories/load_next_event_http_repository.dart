@@ -2,7 +2,7 @@ import 'package:advanced_flutter/domain/entities/next_event.dart';
 import 'package:advanced_flutter/domain/repositories/load_next_event_repository.dart';
 import 'package:http/http.dart';
 
-enum DomainError { unexpected }
+enum DomainError { unexpected, sessionExpired }
 
 class LoadNextEventHttpRepository implements LoadNextEventRepository {
   final Client client;
@@ -19,6 +19,10 @@ class LoadNextEventHttpRepository implements LoadNextEventRepository {
   Future<NextEvent> loadNextEvent({required String groupId}) async {
     final urlWithParams = url.replaceFirst(':groupId', groupId);
     final result = await client.get(Uri.parse(urlWithParams), headers: headers);
+
+    if (result.statusCode == 401) {
+      throw DomainError.sessionExpired;
+    }
 
     if (result.statusCode == 400 ||
         result.statusCode == 403 ||

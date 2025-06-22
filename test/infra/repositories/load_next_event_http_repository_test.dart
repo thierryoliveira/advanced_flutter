@@ -110,6 +110,13 @@ void main() {
     expect(future, throwsA(DomainError.unexpected));
   });
 
+  test('should throw SessionExpiredError on 401', () async {
+    mockHttpClient().thenAnswer((_) async => Response('', 401));
+    final future = sut.loadNextEvent(groupId: groupId);
+
+    expect(future, throwsA(DomainError.sessionExpired));
+  });
+
   test('should throw UnexpectedError on 403', () async {
     mockHttpClient().thenAnswer((_) async => Response('', 403));
     final future = sut.loadNextEvent(groupId: groupId);
