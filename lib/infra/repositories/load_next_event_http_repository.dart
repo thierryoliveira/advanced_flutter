@@ -1,3 +1,4 @@
+import 'package:advanced_flutter/domain/entities/next_event.dart';
 import 'package:http/http.dart';
 
 class LoadNextEventHttpRepository {
@@ -11,8 +12,9 @@ class LoadNextEventHttpRepository {
     this.headers,
   });
 
-  Future<Future<Response>> loadNextEvent({required String groupId}) async {
+  Future<NextEvent> loadNextEvent({required String groupId}) async {
     final urlWithParams = url.replaceFirst(':groupId', groupId);
-    return client.get(Uri.parse(urlWithParams), headers: headers);
+    final result = await client.get(Uri.parse(urlWithParams), headers: headers);
+    return NextEvent.fromJson(result.body);
   }
 }

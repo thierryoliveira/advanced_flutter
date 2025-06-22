@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class NextEventPlayer {
   final String id;
   final String name;
@@ -42,5 +44,43 @@ class NextEventPlayer {
     final lastChar =
         names.last.split('').elementAtOrNull(names.length == 1 ? 1 : 0) ?? '';
     return '$firstChar$lastChar'.toUpperCase();
+  }
+
+  Map<String, dynamic> toMap() {
+    final result = <String, dynamic>{};
+
+    result.addAll({'id': id});
+    result.addAll({'name': name});
+    result.addAll({'initials': initials});
+    if (photo != null) {
+      result.addAll({'photo': photo});
+    }
+    if (position != null) {
+      result.addAll({'position': position});
+    }
+    result.addAll({'isConfirmed': isConfirmed});
+    if (confirmationDate != null) {
+      result.addAll({
+        'confirmationDate': confirmationDate!.millisecondsSinceEpoch,
+      });
+    }
+
+    return result;
+  }
+
+  factory NextEventPlayer.fromJson(String source) {
+    final map = json.decode(source);
+    return NextEventPlayer.fromMap(map);
+  }
+
+  factory NextEventPlayer.fromMap(Map<String, dynamic> map) {
+    return NextEventPlayer(
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      photo: map['photo'],
+      position: map['position'],
+      isConfirmed: map['isConfirmed'] ?? false,
+      confirmationDate: DateTime.tryParse(map['confirmationDate'] ?? ''),
+    );
   }
 }
