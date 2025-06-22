@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../../helpers/fakes.dart';
+import '../../../helpers/fakes.dart';
 
 void main() {
   late LoadNextEventHttpRepository sut;

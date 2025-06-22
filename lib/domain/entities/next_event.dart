@@ -13,8 +13,7 @@ class NextEvent {
     required this.players,
   });
 
-  factory NextEvent.fromJson(String source) {
-    final map = json.decode(source);
+  factory NextEvent.fromMap(Map<String, dynamic> map) {
     return NextEvent(
       groupName: map['groupName'] ?? '',
       date: DateTime.parse(map['date']),
@@ -22,5 +21,10 @@ class NextEvent {
         map['players']?.map((player) => NextEventPlayer.fromMap(player)),
       ),
     );
+  }
+
+  factory NextEvent.fromJson(String source) {
+    final map = json.decode(source);
+    return NextEvent.fromMap(map);
   }
 }
