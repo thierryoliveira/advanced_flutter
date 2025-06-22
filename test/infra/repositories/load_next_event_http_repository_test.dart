@@ -38,6 +38,9 @@ void main() {
     }
 ''';
 
+  When<Future<Response>> mockHttpClient() =>
+      when(() => httpClient.get(any(), headers: any(named: 'headers')));
+
   setUp(() {
     httpClient = HttpClientSpy();
     sut = LoadNextEventHttpRepository(
@@ -48,9 +51,7 @@ void main() {
     registerFallbackValue(Uri());
     groupId = anyString();
 
-    when(
-      () => httpClient.get(any(), headers: any(named: 'headers')),
-    ).thenAnswer((_) async => Response(successJson, 200));
+    mockHttpClient().thenAnswer((_) async => Response(successJson, 200));
   });
 
   test('should request with the correct method', () async {
@@ -101,4 +102,11 @@ void main() {
       expect(nextEvent.players.last.isConfirmed, isTrue);
     },
   );
+
+  test('should throw UnexpectedError on 400', () async {
+    mockHttpClient().thenAnswer((_) async => Response('', 400));
+    final future = sut.loadNextEvent(groupId: groupId);
+
+    expect(future, throwsA(DomainError.unexpected));
+  });
 }
