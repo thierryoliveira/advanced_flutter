@@ -8,9 +8,14 @@ import '../../helpers/fakes.dart';
 class HttpClientSpy extends Mock implements Client {}
 
 void main() {
+  late LoadNextEventHttpRepository sut;
   late Client httpClient;
   late String groupId;
   const url = 'https://domain.com/api/groups/:groupId/next_event';
+  const headers = <String, String>{
+    'content-type': 'application/json',
+    'accept': 'application/json',
+  };
   const successJson = '''
     {
       "groupName": "group name",
@@ -35,6 +40,11 @@ void main() {
 
   setUp(() {
     httpClient = HttpClientSpy();
+    sut = LoadNextEventHttpRepository(
+      client: httpClient,
+      url: url,
+      headers: headers,
+    );
     registerFallbackValue(Uri());
     groupId = anyString();
 
@@ -44,33 +54,25 @@ void main() {
   });
 
   test('should request with the correct method', () async {
-    final sut = LoadNextEventHttpRepository(client: httpClient, url: url);
     await sut.loadNextEvent(groupId: groupId);
 
-    verify(() => httpClient.get(any())).called(1);
+    verify(
+      () => httpClient.get(any(), headers: any(named: 'headers')),
+    ).called(1);
   });
 
   test('should request with the correct URL', () async {
-    final sut = LoadNextEventHttpRepository(client: httpClient, url: url);
     await sut.loadNextEvent(groupId: groupId);
 
     verify(
       () => httpClient.get(
         Uri.parse('https://domain.com/api/groups/$groupId/next_event'),
+        headers: any(named: 'headers'),
       ),
     ).called(1);
   });
 
   test('should request with the correct headers', () async {
-    final headers = <String, String>{
-      'content-type': 'application/json',
-      'accept': 'application/json',
-    };
-    final sut = LoadNextEventHttpRepository(
-      client: httpClient,
-      url: url,
-      headers: headers,
-    );
     await sut.loadNextEvent(groupId: groupId);
 
     verify(() => httpClient.get(any(), headers: headers)).called(1);
@@ -79,7 +81,6 @@ void main() {
   test(
     'should return a [NextEvent] object when the status code is 200',
     () async {
-      final sut = LoadNextEventHttpRepository(client: httpClient, url: url);
       final nextEvent = await sut.loadNextEvent(groupId: groupId);
 
       expect(nextEvent.groupName, 'group name');
