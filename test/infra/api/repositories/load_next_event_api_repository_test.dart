@@ -95,4 +95,15 @@ void main() {
     );
     expect(nextEvent.players.last.isConfirmed, isTrue);
   });
+
+  test('should rethrow on error', () {
+    final error = Error();
+    when(
+      () => httpClient.get(url: url, params: any(named: 'params')),
+    ).thenThrow(error);
+
+    final future = sut.loadNextEvent(groupId: groupId);
+
+    expect(future, throwsA(error));
+  });
 }
