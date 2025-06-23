@@ -41,7 +41,7 @@ void main() {
       when(() => httpClient.get(any(), headers: any(named: 'headers')));
 
   setUp(() {
-    httpClient = HttpClientSpy();
+    httpClient = ClientSpy();
     sut = LoadNextEventHttpRepository(
       client: httpClient,
       url: url,
