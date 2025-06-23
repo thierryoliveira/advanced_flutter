@@ -13,21 +13,33 @@ class HttpClient {
     required String url,
     Map<String, String>? headers,
     Map<String, String?>? params,
+    Map<String, String>? queryString,
   }) async {
     final requestHeaders = {
       'content-type': 'application/json',
       'accept': 'application/json',
       ...?headers,
     };
-    final uri = _buildUri(url: url, params: params);
+    final uri = _buildUri(url: url, params: params, queryString: queryString);
 
     await client.get(uri, headers: requestHeaders);
   }
 
-  Uri _buildUri({required String url, Map<String, String?>? params}) {
+  Uri _buildUri({
+    required String url,
+    Map<String, String?>? params,
+    Map<String, String>? queryString,
+  }) {
     params?.forEach(
       (key, value) => url = url.replaceFirst(':$key', value ?? ''),
     );
+
+    if (queryString != null && queryString.isNotEmpty) {
+      final queryValues = <String>[];
+      queryString.forEach((key, value) => queryValues.add('$key=$value'));
+
+      url += '?${queryValues.join('&')}';
+    }
 
     if (url.endsWith('/')) url = url.substring(0, url.length - 1);
     return Uri.parse(url);
@@ -127,6 +139,20 @@ void main() {
       verify(
         () => client.get(
           Uri.parse('http://anyurl.com/:param1/:param2'),
+          headers: any(named: 'headers'),
+        ),
+      ).called(1);
+    });
+
+    test('should request ignoring query strings', () async {
+      await sut.get(
+        url: url,
+        queryString: {'queryParam1': 'value1', 'queryParam2': 'value2'},
+      );
+
+      verify(
+        () => client.get(
+          Uri.parse('$url?queryParam1=value1&queryParam2=value2'),
           headers: any(named: 'headers'),
         ),
       ).called(1);
