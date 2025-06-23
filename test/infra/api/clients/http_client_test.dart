@@ -12,7 +12,7 @@ class HttpClient {
   Future<void> get({
     required String url,
     Map<String, String>? headers,
-    Map<String, String>? params,
+    Map<String, String?>? params,
   }) async {
     final requestHeaders = {
       'content-type': 'application/json',
@@ -24,8 +24,12 @@ class HttpClient {
     await client.get(uri, headers: requestHeaders);
   }
 
-  Uri _buildUri({required String url, Map<String, String>? params}) {
-    params?.forEach((key, value) => url = url.replaceFirst(':$key', value));
+  Uri _buildUri({required String url, Map<String, String?>? params}) {
+    params?.forEach(
+      (key, value) => url = url.replaceFirst(':$key', value ?? ''),
+    );
+
+    if (url.endsWith('/')) url = url.substring(0, url.length - 1);
     return Uri.parse(url);
   }
 }
@@ -99,6 +103,18 @@ void main() {
       verify(
         () => client.get(
           Uri.parse('http://anyurl.com/value1/value2'),
+          headers: any(named: 'headers'),
+        ),
+      ).called(1);
+    });
+
+    test('should request with correct optional params', () async {
+      url = 'http://anyurl.com/:param1/:param2';
+      await sut.get(url: url, params: {'param1': 'value1', 'param2': null});
+
+      verify(
+        () => client.get(
+          Uri.parse('http://anyurl.com/value1'),
           headers: any(named: 'headers'),
         ),
       ).called(1);
