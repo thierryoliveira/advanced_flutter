@@ -1,3 +1,4 @@
+import 'package:dartx/dartx.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart';
@@ -30,18 +31,8 @@ class HttpClient {
     Map<String, String?>? params,
     Map<String, String>? queryString,
   }) {
-    params?.forEach(
-      (key, value) => url = url.replaceFirst(':$key', value ?? ''),
-    );
-
-    if (queryString != null && queryString.isNotEmpty) {
-      final queryValues = <String>[];
-      queryString.forEach((key, value) => queryValues.add('$key=$value'));
-
-      url += '?${queryValues.join('&')}';
-    }
-
-    if (url.endsWith('/')) url = url.substring(0, url.length - 1);
+    url = params?.keys.fold(url, (result, key) => result.replaceFirst(':$key', params[key] ?? '')).removeSuffix('/') ?? url;
+    url = queryString?.keys.fold('$url?', (result, key) => '$result$key=${queryString[key]}&').removeSuffix('&') ?? url;
     return Uri.parse(url);
   }
 }
