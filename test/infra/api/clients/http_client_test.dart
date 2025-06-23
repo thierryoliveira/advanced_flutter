@@ -157,5 +157,24 @@ void main() {
         ),
       ).called(1);
     });
+
+    test('should request ignoring query strings and params', () async {
+      url = 'http://anyurl.com/:param3/:param4';
+
+      await sut.get(
+        url: url,
+        params: {'param3': 'value3', 'param4': 'value4'},
+        queryString: {'queryParam1': 'value1', 'queryParam2': 'value2'},
+      );
+
+      verify(
+        () => client.get(
+          Uri.parse(
+            'http://anyurl.com/value3/value4?queryParam1=value1&queryParam2=value2',
+          ),
+          headers: any(named: 'headers'),
+        ),
+      ).called(1);
+    });
   });
 }
