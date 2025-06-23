@@ -15,17 +15,24 @@ class HttpClient {
 }
 
 void main() {
+  late Client client;
+  late HttpClient sut;
+
   setUpAll(() {
     registerFallbackValue(Uri());
   });
 
-  test('should request using the correct method', () async {
-    final client = ClientSpy();
+  setUp(() {
+    client = ClientSpy();
+    sut = HttpClient(client: client);
+
     when(() => client.get(any())).thenAnswer((_) async => Response('', 200));
-    final sut = HttpClient(client: client);
+  });
 
-    await sut.get();
-
-    verify(() => client.get(any())).called(1);
+  group('GET method:', () {
+    test('should request using the correct method', () async {
+      await sut.get();
+      verify(() => client.get(any())).called(1);
+    });
   });
 }
