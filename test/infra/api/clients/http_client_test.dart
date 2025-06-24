@@ -1,3 +1,4 @@
+import 'package:advanced_flutter/domain/entities/domain_error.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
@@ -23,7 +24,11 @@ class HttpClient {
     };
     final uri = _buildUri(url: url, params: params, queryString: queryString);
 
-    await client.get(uri, headers: requestHeaders);
+    final response = await client.get(uri, headers: requestHeaders);
+
+    if (response.statusCode != 200) {
+      throw DomainError.fromStatusCode(response.statusCode);
+    }
   }
 
   Uri _buildUri({
@@ -31,8 +36,19 @@ class HttpClient {
     Map<String, String?>? params,
     Map<String, String>? queryString,
   }) {
-    url = params?.keys.fold(url, (result, key) => result.replaceFirst(':$key', params[key] ?? '')).removeSuffix('/') ?? url;
-    url = queryString?.keys.fold('$url?', (result, key) => '$result$key=${queryString[key]}&').removeSuffix('&') ?? url;
+    url =
+        params?.keys
+            .fold(
+              url,
+              (result, key) => result.replaceFirst(':$key', params[key] ?? ''),
+            )
+            .removeSuffix('/') ??
+        url;
+    url =
+        queryString?.keys
+            .fold('$url?', (result, key) => '$result$key=${queryString[key]}&')
+            .removeSuffix('&') ??
+        url;
     return Uri.parse(url);
   }
 }
@@ -166,6 +182,36 @@ void main() {
           headers: any(named: 'headers'),
         ),
       ).called(1);
+    });
+
+    test('should throw UnexpectedError on 400', () async {
+      mockClient().thenAnswer((_) async => Response('', 400));
+      final future = sut.get(url: url);
+      expect(future, throwsA(DomainError.unexpected));
+    });
+
+    test('should throw SessionExpiredError on 401', () async {
+      mockClient().thenAnswer((_) async => Response('', 401));
+      final future = sut.get(url: url);
+      expect(future, throwsA(DomainError.sessionExpired));
+    });
+
+    test('should throw UnexpectedError on 403', () async {
+      mockClient().thenAnswer((_) async => Response('', 403));
+      final future = sut.get(url: url);
+      expect(future, throwsA(DomainError.unexpected));
+    });
+
+    test('should throw UnexpectedError on 404', () async {
+      mockClient().thenAnswer((_) async => Response('', 404));
+      final future = sut.get(url: url);
+      expect(future, throwsA(DomainError.unexpected));
+    });
+
+    test('should throw UnexpectedError on 500', () async {
+      mockClient().thenAnswer((_) async => Response('', 500));
+      final future = sut.get(url: url);
+      expect(future, throwsA(DomainError.unexpected));
     });
   });
 }
