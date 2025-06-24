@@ -70,6 +70,27 @@ void main() {
       },
     );
 
+    test(
+      'should request with the correct headers appending the default when custom headers different than strings are provided',
+      () async {
+        await sut.get(
+          url: url,
+          headers: {'numericHeader': 7, 'booleanHeader': true},
+        );
+        verify(
+          () => client.get(
+            any(),
+            headers: {
+              'content-type': 'application/json',
+              'accept': 'application/json',
+              'numericHeader': '7',
+              'booleanHeader': 'true',
+            },
+          ),
+        ).called(1);
+      },
+    );
+
     test('should request with correct params', () async {
       url = 'http://anyurl.com/:param1/:param2';
       await sut.get(url: url, params: {'param1': 'value1', 'param2': 'value2'});

@@ -14,7 +14,7 @@ final class HttpAdapter implements HttpGetClient {
   @override
   Future<T?> get<T>({
     required String url,
-    Map<String, String>? headers,
+    Json? headers,
     Map<String, String?>? params,
     Map<String, String>? queryString,
   }) async {
@@ -40,12 +40,17 @@ final class HttpAdapter implements HttpGetClient {
     return decodedJson;
   }
 
-  Map<String, String> _buildHeaders({Map<String, String>? customHeaders}) {
-    return {
+  Map<String, String> _buildHeaders({Json? customHeaders}) {
+    final defaultHeaders = {
       'content-type': 'application/json',
       'accept': 'application/json',
-      ...?customHeaders,
     };
+
+    final customHeadersStringfied = customHeaders?.map(
+      (key, value) => MapEntry(key, value.toString()),
+    );
+
+    return {...defaultHeaders, ...?customHeadersStringfied};
   }
 
   Uri _buildUri({
