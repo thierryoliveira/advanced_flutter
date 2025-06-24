@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:advanced_flutter/domain/entities/domain_error.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,7 +13,7 @@ class HttpClient {
 
   HttpClient({required this.client});
 
-  Future<void> get({
+  Future<T> get<T>({
     required String url,
     Map<String, String>? headers,
     Map<String, String?>? params,
@@ -29,6 +31,8 @@ class HttpClient {
     if (response.statusCode != 200) {
       throw DomainError.fromStatusCode(response.statusCode);
     }
+
+    return jsonDecode(response.body);
   }
 
   Uri _buildUri({
@@ -57,6 +61,7 @@ void main() {
   late Client client;
   late HttpClient sut;
   late String url;
+  const basicJson = '{"key1": "value1", "key2": "value2"}';
 
   setUpAll(() {
     registerFallbackValue(Uri());
@@ -70,7 +75,7 @@ void main() {
     sut = HttpClient(client: client);
     url = anyString();
 
-    mockClient().thenAnswer((_) async => Response('', 200));
+    mockClient().thenAnswer((_) async => Response(basicJson, 200));
   });
 
   group('GET method:', () {
@@ -212,6 +217,13 @@ void main() {
       mockClient().thenAnswer((_) async => Response('', 500));
       final future = sut.get(url: url);
       expect(future, throwsA(DomainError.unexpected));
+    });
+
+    test('should return a Map when successful', () async {
+      final data = await sut.get(url: url);
+      expect(data, isA<Map>());
+      expect(data['key1'], 'value1');
+      expect(data['key2'], 'value2');
     });
   });
 }
