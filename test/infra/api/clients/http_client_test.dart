@@ -29,11 +29,11 @@ class HttpClient {
 
     final response = await client.get(uri, headers: requestHeaders);
 
-    if (response.statusCode != 200) {
+    if (![200, 204].contains(response.statusCode)) {
       throw DomainError.fromStatusCode(response.statusCode);
     }
 
-    if (response.body.isEmpty) return null;
+    if (response.body.isEmpty || response.statusCode == 204) return null;
 
     final decodedJson = jsonDecode(response.body);
     if (T == JsonList) {
@@ -269,6 +269,12 @@ void main() {
 
     test('should return null on 200 with empty response', () async {
       mockClient().thenAnswer((_) async => Response('', 200));
+      final data = await sut.get(url: url);
+      expect(data, isNull);
+    });
+
+    test('should return null on 204', () async {
+      mockClient().thenAnswer((_) async => Response('', 204));
       final data = await sut.get(url: url);
       expect(data, isNull);
     });
