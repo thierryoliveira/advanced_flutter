@@ -6,6 +6,6 @@ import 'package:mocktail/mocktail.dart';
 
 String anyString() => Random().nextInt(50000).toString();
 
-class ClientSpy extends Mock implements Client {}
+final class ClientSpy extends Mock implements Client {}
 
-class HttpGetClientSpy extends Mock implements HttpGetClient {}
+final class HttpGetClientSpy extends Mock implements HttpGetClient {}

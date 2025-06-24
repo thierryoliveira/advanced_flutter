@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class NextEventPlayer {
+final class NextEventPlayer {
   final String id;
   final String name;
   final String initials;
@@ -9,7 +9,7 @@ class NextEventPlayer {
   final bool isConfirmed;
   final DateTime? confirmationDate;
 
-  NextEventPlayer._({
+  const NextEventPlayer._({
     required this.id,
     required this.name,
     required this.isConfirmed,
