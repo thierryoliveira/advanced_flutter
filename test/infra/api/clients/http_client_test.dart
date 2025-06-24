@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:advanced_flutter/domain/entities/domain_error.dart';
+import 'package:advanced_flutter/infra/types/json.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
@@ -32,7 +33,12 @@ class HttpClient {
       throw DomainError.fromStatusCode(response.statusCode);
     }
 
-    return jsonDecode(response.body);
+    final decodedJson = jsonDecode(response.body);
+    if (T == JsonList) {
+      return decodedJson.whereType<Json>().toList();
+    }
+
+    return decodedJson;
   }
 
   Uri _buildUri({
@@ -220,10 +226,43 @@ void main() {
     });
 
     test('should return a Map when successful', () async {
-      final data = await sut.get(url: url);
+      final data = await sut.get<Json>(url: url);
       expect(data, isA<Map>());
       expect(data['key1'], 'value1');
       expect(data['key2'], 'value2');
+    });
+
+    test('should return an Array of Map when successful', () async {
+      final jsonList = '[$basicJson, {"key3": "value3"}]';
+      mockClient().thenAnswer((_) async => Response(jsonList, 200));
+      final data = await sut.get(url: url);
+      expect(data, isA<List>());
+      expect(data[0]['key1'], 'value1');
+      expect(data[0]['key2'], 'value2');
+      expect(data[1]['key3'], 'value3');
+    });
+
+    test('should return an Map containing a List when successful', () async {
+      final jsonList = '''
+        {
+            "key1": "value1",
+            "key2": [
+                {
+                    "key": "value1"
+                },
+                {
+                    "key": "value2"
+                }
+            ]
+        }
+      ''';
+      mockClient().thenAnswer((_) async => Response(jsonList, 200));
+      final data = await sut.get(url: url);
+      expect(data, isA<Map>());
+      expect(data['key1'], 'value1');
+      expect(data['key2'], isA<List>());
+      expect(data['key2'][0]['key'], 'value1');
+      expect(data['key2'][1]['key'], 'value2');
     });
   });
 }
