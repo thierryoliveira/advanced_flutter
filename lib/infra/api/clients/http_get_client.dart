@@ -4,7 +4,7 @@ abstract interface class HttpGetClient {
   Future<T?> get<T>({
     required String url,
     Json? headers,
-    Map<String, String?>? params,
+    Json? params,
     Map<String, String>? queryString,
   });
 }

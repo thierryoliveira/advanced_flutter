@@ -103,6 +103,18 @@ void main() {
       ).called(1);
     });
 
+    test('should request with correct non-string params', () async {
+      url = 'http://anyurl.com/:param1/:param2';
+      await sut.get(url: url, params: {'param1': 123, 'param2': false});
+
+      verify(
+        () => client.get(
+          Uri.parse('http://anyurl.com/123/false'),
+          headers: any(named: 'headers'),
+        ),
+      ).called(1);
+    });
+
     test('should request with correct optional params', () async {
       url = 'http://anyurl.com/:param1/:param2';
       await sut.get(url: url, params: {'param1': 'value1', 'param2': null});
