@@ -1,73 +1,15 @@
-import 'dart:convert';
-
 import 'package:advanced_flutter/domain/entities/domain_error.dart';
+import 'package:advanced_flutter/infra/api/adapters/http_adapter.dart';
 import 'package:advanced_flutter/infra/types/json.dart';
-import 'package:dartx/dartx.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../helpers/fakes.dart';
 
-class HttpClient {
-  final Client client;
-
-  HttpClient({required this.client});
-
-  Future<T?> get<T>({
-    required String url,
-    Map<String, String>? headers,
-    Map<String, String?>? params,
-    Map<String, String>? queryString,
-  }) async {
-    final requestHeaders = {
-      'content-type': 'application/json',
-      'accept': 'application/json',
-      ...?headers,
-    };
-    final uri = _buildUri(url: url, params: params, queryString: queryString);
-
-    final response = await client.get(uri, headers: requestHeaders);
-
-    if (![200, 204].contains(response.statusCode)) {
-      throw DomainError.fromStatusCode(response.statusCode);
-    }
-
-    if (response.body.isEmpty || response.statusCode == 204) return null;
-
-    final decodedJson = jsonDecode(response.body);
-    if (T == JsonList) {
-      return decodedJson.whereType<Json>().toList();
-    }
-
-    return decodedJson;
-  }
-
-  Uri _buildUri({
-    required String url,
-    Map<String, String?>? params,
-    Map<String, String>? queryString,
-  }) {
-    url =
-        params?.keys
-            .fold(
-              url,
-              (result, key) => result.replaceFirst(':$key', params[key] ?? ''),
-            )
-            .removeSuffix('/') ??
-        url;
-    url =
-        queryString?.keys
-            .fold('$url?', (result, key) => '$result$key=${queryString[key]}&')
-            .removeSuffix('&') ??
-        url;
-    return Uri.parse(url);
-  }
-}
-
 void main() {
   late Client client;
-  late HttpClient sut;
+  late HttpAdapter sut;
   late String url;
   const basicJson = '{"key1": "value1", "key2": "value2"}';
 
@@ -80,7 +22,7 @@ void main() {
 
   setUp(() {
     client = ClientSpy();
-    sut = HttpClient(client: client);
+    sut = HttpAdapter(client: client);
     url = anyString();
 
     mockClient().thenAnswer((_) async => Response(basicJson, 200));
