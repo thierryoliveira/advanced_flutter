@@ -14,7 +14,7 @@ class HttpClient {
 
   HttpClient({required this.client});
 
-  Future<T> get<T>({
+  Future<T?> get<T>({
     required String url,
     Map<String, String>? headers,
     Map<String, String?>? params,
@@ -32,6 +32,8 @@ class HttpClient {
     if (response.statusCode != 200) {
       throw DomainError.fromStatusCode(response.statusCode);
     }
+
+    if (response.body.isEmpty) return null;
 
     final decodedJson = jsonDecode(response.body);
     if (T == JsonList) {
@@ -228,8 +230,8 @@ void main() {
     test('should return a Map when successful', () async {
       final data = await sut.get<Json>(url: url);
       expect(data, isA<Map>());
-      expect(data['key1'], 'value1');
-      expect(data['key2'], 'value2');
+      expect(data?['key1'], 'value1');
+      expect(data?['key2'], 'value2');
     });
 
     test('should return an Array of Map when successful', () async {
@@ -263,6 +265,12 @@ void main() {
       expect(data['key2'], isA<List>());
       expect(data['key2'][0]['key'], 'value1');
       expect(data['key2'][1]['key'], 'value2');
+    });
+
+    test('should return null on 200 with empty response', () async {
+      mockClient().thenAnswer((_) async => Response('', 200));
+      final data = await sut.get(url: url);
+      expect(data, isNull);
     });
   });
 }
