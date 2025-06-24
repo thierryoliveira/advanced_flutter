@@ -18,15 +18,15 @@ class HttpAdapter implements HttpGetClient {
     Map<String, String?>? params,
     Map<String, String>? queryString,
   }) async {
-    final requestHeaders = {
-      'content-type': 'application/json',
-      'accept': 'application/json',
-      ...?headers,
-    };
-    final uri = _buildUri(url: url, params: params, queryString: queryString);
+    final response = await client.get(
+      _buildUri(url: url, params: params, queryString: queryString),
+      headers: _buildHeaders(customHeaders: headers),
+    );
 
-    final response = await client.get(uri, headers: requestHeaders);
+    return _handleReponse<T>(response);
+  }
 
+  T? _handleReponse<T>(Response response) {
     if (![200, 204].contains(response.statusCode)) {
       throw DomainError.fromStatusCode(response.statusCode);
     }
@@ -37,8 +37,15 @@ class HttpAdapter implements HttpGetClient {
     if (T == JsonList) {
       return decodedJson.whereType<Json>().toList();
     }
-
     return decodedJson;
+  }
+
+  Map<String, String> _buildHeaders({Map<String, String>? customHeaders}) {
+    return {
+      'content-type': 'application/json',
+      'accept': 'application/json',
+      ...?customHeaders,
+    };
   }
 
   Uri _buildUri({
