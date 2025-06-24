@@ -1,4 +1,4 @@
-import 'package:advanced_flutter/domain/entities/domain_error.dart';
+import 'package:advanced_flutter/domain/entities/errors.dart';
 import 'package:advanced_flutter/infra/api/adapters/http_adapter.dart';
 import 'package:advanced_flutter/infra/types/json.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -142,31 +142,31 @@ void main() {
     test('should throw UnexpectedError on 400', () async {
       mockClient().thenAnswer((_) async => Response('', 400));
       final future = sut.get(url: url);
-      expect(future, throwsA(DomainError.unexpected));
+      expect(future, throwsA(isA<UnexpectedError>()));
     });
 
     test('should throw SessionExpiredError on 401', () async {
       mockClient().thenAnswer((_) async => Response('', 401));
       final future = sut.get(url: url);
-      expect(future, throwsA(DomainError.sessionExpired));
+      expect(future, throwsA(isA<SessionExpiredError>()));
     });
 
     test('should throw UnexpectedError on 403', () async {
       mockClient().thenAnswer((_) async => Response('', 403));
       final future = sut.get(url: url);
-      expect(future, throwsA(DomainError.unexpected));
+      expect(future, throwsA(isA<UnexpectedError>()));
     });
 
     test('should throw UnexpectedError on 404', () async {
       mockClient().thenAnswer((_) async => Response('', 404));
       final future = sut.get(url: url);
-      expect(future, throwsA(DomainError.unexpected));
+      expect(future, throwsA(isA<UnexpectedError>()));
     });
 
     test('should throw UnexpectedError on 500', () async {
       mockClient().thenAnswer((_) async => Response('', 500));
       final future = sut.get(url: url);
-      expect(future, throwsA(DomainError.unexpected));
+      expect(future, throwsA(isA<UnexpectedError>()));
     });
 
     test('should return a Map when successful', () async {
