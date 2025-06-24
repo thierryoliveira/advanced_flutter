@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:advanced_flutter/infra/types/json.dart';
+
 final class NextEventPlayer {
   final String id;
   final String name;
@@ -46,7 +48,7 @@ final class NextEventPlayer {
     return '$firstChar$lastChar'.toUpperCase();
   }
 
-  Map<String, dynamic> toMap() {
+  Json toMap() {
     final result = <String, dynamic>{};
 
     result.addAll({'id': id});
@@ -73,7 +75,7 @@ final class NextEventPlayer {
     return NextEventPlayer.fromMap(map);
   }
 
-  factory NextEventPlayer.fromMap(Map<String, dynamic> map) {
+  factory NextEventPlayer.fromMap(Json map) {
     return NextEventPlayer(
       id: map['id'] ?? '',
       name: map['name'] ?? '',

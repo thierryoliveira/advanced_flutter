@@ -5,6 +5,6 @@ abstract interface class HttpGetClient {
     required String url,
     Json? headers,
     Json? params,
-    Map<String, String>? queryString,
+    Json? queryParams,
   });
 }

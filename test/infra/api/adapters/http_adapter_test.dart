@@ -139,10 +139,10 @@ void main() {
       ).called(1);
     });
 
-    test('should request ignoring query strings', () async {
+    test('should request with correct query strings', () async {
       await sut.get(
         url: url,
-        queryString: {'queryParam1': 'value1', 'queryParam2': 'value2'},
+        queryParams: {'queryParam1': 'value1', 'queryParam2': 'value2'},
       );
 
       verify(
@@ -153,13 +153,27 @@ void main() {
       ).called(1);
     });
 
-    test('should request ignoring query strings and params', () async {
+    test('should request with correct non-string query params', () async {
+      await sut.get(
+        url: url,
+        queryParams: {'queryParam1': 123, 'queryParam2': true},
+      );
+
+      verify(
+        () => client.get(
+          Uri.parse('$url?queryParam1=123&queryParam2=true'),
+          headers: any(named: 'headers'),
+        ),
+      ).called(1);
+    });
+
+    test('should request with correct query strings and params', () async {
       url = 'http://anyurl.com/:param3/:param4';
 
       await sut.get(
         url: url,
         params: {'param3': 'value3', 'param4': 'value4'},
-        queryString: {'queryParam1': 'value1', 'queryParam2': 'value2'},
+        queryParams: {'queryParam1': 'value1', 'queryParam2': 'value2'},
       );
 
       verify(

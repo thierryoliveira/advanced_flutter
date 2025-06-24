@@ -16,10 +16,10 @@ final class HttpAdapter implements HttpGetClient {
     required String url,
     Json? headers,
     Json? params,
-    Map<String, String>? queryString,
+    Json? queryParams,
   }) async {
     final response = await client.get(
-      _buildUri(url: url, params: params, queryString: queryString),
+      _buildUri(url: url, params: params, queryParams: queryParams),
       headers: _buildHeaders(customHeaders: headers),
     );
 
@@ -53,11 +53,7 @@ final class HttpAdapter implements HttpGetClient {
     return {...defaultHeaders, ...?customHeadersStringfied};
   }
 
-  Uri _buildUri({
-    required String url,
-    Json? params,
-    Map<String, String>? queryString,
-  }) {
+  Uri _buildUri({required String url, Json? params, Json? queryParams}) {
     url =
         params?.keys
             .fold(
@@ -68,8 +64,8 @@ final class HttpAdapter implements HttpGetClient {
             .removeSuffix('/') ??
         url;
     url =
-        queryString?.keys
-            .fold('$url?', (result, key) => '$result$key=${queryString[key]}&')
+        queryParams?.keys
+            .fold('$url?', (result, key) => '$result$key=${queryParams[key]}&')
             .removeSuffix('&') ??
         url;
     return Uri.parse(url);

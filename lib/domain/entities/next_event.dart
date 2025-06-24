@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:advanced_flutter/domain/entities/next_event_player.dart';
+import 'package:advanced_flutter/infra/types/json.dart';
 
 final class NextEvent {
   final String groupName;
@@ -13,7 +14,7 @@ final class NextEvent {
     required this.players,
   });
 
-  factory NextEvent.fromMap(Map<String, dynamic> map) {
+  factory NextEvent.fromMap(Json map) {
     return NextEvent(
       groupName: map['groupName'] ?? '',
       date: DateTime.parse(map['date']),
