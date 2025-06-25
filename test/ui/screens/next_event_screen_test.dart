@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../helpers/fakes.dart';
 
@@ -56,22 +57,27 @@ void main() {
   late Widget sut;
   late NextEventPresenter presenter;
   late String groupId;
-  late StreamController<String> controller;
+  late BehaviorSubject nextEventSubject;
 
   setUp(() {
     presenter = NextEventPresenterSpy();
     groupId = anyString();
-    controller = StreamController<String>();
+    nextEventSubject = BehaviorSubject();
     sut = MaterialApp(
       home: NextEventScreen(presenter: presenter, groupId: groupId),
     );
 
-    when(() => presenter.nextEventStream).thenAnswer((_) => controller.stream);
+    when(
+      () => presenter.nextEventStream,
+    ).thenAnswer((_) => nextEventSubject.stream);
   });
 
   tearDown(() {
-    controller.close();
+    nextEventSubject.close();
   });
+
+  void emitNextEvent() => nextEventSubject.add('');
+  void emitError() => nextEventSubject.addError(Error());
 
   testWidgets('should load event data on screen inits', (tester) async {
     await tester.pumpWidget(sut);
@@ -93,7 +99,20 @@ void main() {
     await tester.pumpWidget(sut);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-    controller.add('event');
+    emitNextEvent();
+    verify(() => presenter.loadNextEvent(groupId: groupId)).called(1);
+
+    await tester.pump();
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets('should hide the spinner when the the loading failed', (
+    tester,
+  ) async {
+    await tester.pumpWidget(sut);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    emitError();
     verify(() => presenter.loadNextEvent(groupId: groupId)).called(1);
 
     await tester.pump();
