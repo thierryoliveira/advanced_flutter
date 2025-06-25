@@ -39,12 +39,19 @@ abstract class NextEventPresenter {
 final class NextEventPresenterSpy extends Mock implements NextEventPresenter {}
 
 void main() {
-  testWidgets('should load event data on screen inits', (tester) async {
-    final presenter = NextEventPresenterSpy();
-    final groupId = anyString();
-    final sut = MaterialApp(
+  late Widget sut;
+  late NextEventPresenter presenter;
+  late String groupId;
+
+  setUp(() {
+    presenter = NextEventPresenterSpy();
+    groupId = anyString();
+    sut = MaterialApp(
       home: NextEventScreen(presenter: presenter, groupId: groupId),
     );
+  });
+
+  testWidgets('should load event data on screen inits', (tester) async {
     await tester.pumpWidget(sut);
 
     verify(() => presenter.loadNextEvent(groupId: groupId)).called(1);
