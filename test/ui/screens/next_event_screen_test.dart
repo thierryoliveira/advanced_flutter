@@ -246,4 +246,14 @@ void main() {
     expect(find.text('Ronaldinho'), findsOneWidget);
     expect(find.text('Kaká'), findsOneWidget);
   });
+
+  testWidgets('should hide players section when there are no players', (
+    tester,
+  ) async {
+    await tester.pumpWidget(sut);
+    presenter.emitNextEvent();
+    await tester.pump();
+
+    expect(find.text('CONFIRMED - PLAYERS'), findsNothing);
+  });
 }
