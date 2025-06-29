@@ -55,6 +55,8 @@ class _NextEventScreenState extends State<NextEventScreen> {
                 ),
               if (viewModel.out.isNotEmpty)
                 PlayerPositionSection(title: 'OUT', players: viewModel.out),
+              if (viewModel.doubt.isNotEmpty)
+                PlayerPositionSection(title: 'DOUBT', players: viewModel.doubt),
             ],
           );
         },
@@ -100,11 +102,13 @@ final class NextEventViewModel {
   final List<NextEventPlayerViewModel> goalkeepers;
   final List<NextEventPlayerViewModel> players;
   final List<NextEventPlayerViewModel> out;
+  final List<NextEventPlayerViewModel> doubt;
 
   const NextEventViewModel({
     this.goalkeepers = const [],
     this.players = const [],
     this.out = const [],
+    this.doubt = const [],
   });
 }
 
@@ -137,6 +141,7 @@ void main() {
     List<NextEventPlayerViewModel> goalkeepers = const [],
     List<NextEventPlayerViewModel> players = const [],
     List<NextEventPlayerViewModel> out = const [],
+    List<NextEventPlayerViewModel> doubt = const [],
   }) {
     when(
       () => presenter.emitNextEvent(viewModel: any(named: 'viewModel')),
@@ -146,6 +151,7 @@ void main() {
           goalkeepers: goalkeepers,
           players: players,
           out: out,
+          doubt: doubt,
         ),
       ),
     );
@@ -290,4 +296,18 @@ void main() {
       expect(find.text('OUT'), findsNothing);
     },
   );
+
+  testWidgets('should display the DOUBT section', (tester) async {
+    mockEmitNextEventWith(doubt: mockPlayers);
+
+    await tester.pumpWidget(sut);
+    presenter.emitNextEvent(viewModel: NextEventViewModel(doubt: mockPlayers));
+    await tester.pump();
+    expect(find.text('DOUBT'), findsOneWidget);
+    expect(find.text('4'), findsOneWidget);
+    expect(find.text('Thierry Henry'), findsOneWidget);
+    expect(find.text('Lucas Moura'), findsOneWidget);
+    expect(find.text('Ronaldinho'), findsOneWidget);
+    expect(find.text('Kaká'), findsOneWidget);
+  });
 }
