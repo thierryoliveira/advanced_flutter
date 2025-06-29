@@ -19,7 +19,7 @@ final class LoadNextEventApiRepository implements LoadNextEventRepository {
       url: url,
       params: {'groupId': groupId},
     );
-    if (eventMap == null) throw UnexpectedError();
+    if (eventMap == null) throw const UnexpectedError();
     return NextEvent.fromMap(eventMap);
   }
 }

@@ -31,13 +31,21 @@ class _NextEventScreenState extends State<NextEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder(
+      body: StreamBuilder<NextEventViewModel>(
         stream: widget.presenter.nextEventStream,
         builder: (context, snapshot) {
+          final data = snapshot.data;
           if (snapshot.connectionState != ConnectionState.active) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
-          return SizedBox.shrink();
+          if (snapshot.hasError || data == null) return const SizedBox.shrink();
+          return ListView(
+            children: [
+              const Text('CONFIRMED - GOALKEEPERS'),
+              Text(data.goalkeepers.length.toString()),
+              ...data.goalkeepers.map((player) => Text(player.name)),
+            ],
+          );
         },
       ),
     );
@@ -45,19 +53,50 @@ class _NextEventScreenState extends State<NextEventScreen> {
 }
 
 abstract class NextEventPresenter {
-  Stream get nextEventStream;
+  Stream<NextEventViewModel> get nextEventStream;
 
   void loadNextEvent({required String groupId});
-  void emitNextEvent();
+  void emitNextEvent({
+    NextEventViewModel viewModel = const NextEventViewModel(),
+  });
 }
 
 final class NextEventPresenterSpy extends Mock implements NextEventPresenter {}
+
+final class NextEventViewModel {
+  final List<NextEventPlayerViewModel> goalkeepers;
+
+  const NextEventViewModel({this.goalkeepers = const []});
+}
+
+final class NextEventPlayerViewModel {
+  final String name;
+
+  const NextEventPlayerViewModel({required this.name});
+}
 
 void main() {
   late Widget sut;
   late NextEventPresenter presenter;
   late String groupId;
-  late BehaviorSubject nextEventSubject;
+  late BehaviorSubject<NextEventViewModel> nextEventSubject;
+  final mockGoalkeepers = [
+    const NextEventPlayerViewModel(name: 'Rogerio Ceni'),
+    const NextEventPlayerViewModel(name: 'Buffon'),
+    const NextEventPlayerViewModel(name: 'Dida'),
+  ];
+
+  registerFallbackValue(const NextEventViewModel());
+
+  mockEmitNextEventWith({
+    List<NextEventPlayerViewModel> goalkeepers = const [],
+  }) {
+    when(
+      () => presenter.emitNextEvent(viewModel: any(named: 'viewModel')),
+    ).thenAnswer(
+      (_) => nextEventSubject.add(NextEventViewModel(goalkeepers: goalkeepers)),
+    );
+  }
 
   setUp(() {
     presenter = NextEventPresenterSpy();
@@ -70,13 +109,14 @@ void main() {
     when(
       () => presenter.nextEventStream,
     ).thenAnswer((_) => nextEventSubject.stream);
+
+    mockEmitNextEventWith();
   });
 
   tearDown(() {
     nextEventSubject.close();
   });
 
-  void emitNextEvent() => nextEventSubject.add('');
   void emitError() => nextEventSubject.addError(Error());
 
   testWidgets('should load event data on screen inits', (tester) async {
@@ -99,7 +139,7 @@ void main() {
     await tester.pumpWidget(sut);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-    emitNextEvent();
+    presenter.emitNextEvent();
     verify(() => presenter.loadNextEvent(groupId: groupId)).called(1);
 
     await tester.pump();
@@ -117,5 +157,20 @@ void main() {
 
     await tester.pump();
     expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets('should display goalkeepers section', (tester) async {
+    mockEmitNextEventWith(goalkeepers: mockGoalkeepers);
+
+    await tester.pumpWidget(sut);
+    presenter.emitNextEvent(
+      viewModel: NextEventViewModel(goalkeepers: mockGoalkeepers),
+    );
+    await tester.pump();
+    expect(find.text('CONFIRMED - GOALKEEPERS'), findsOneWidget);
+    expect(find.text('3'), findsOneWidget);
+    expect(find.text('Rogerio Ceni'), findsOneWidget);
+    expect(find.text('Buffon'), findsOneWidget);
+    expect(find.text('Dida'), findsOneWidget);
   });
 }

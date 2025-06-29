@@ -8,7 +8,7 @@ final class NextEventPlayer {
   final String initials;
   final String? photo;
   final String? position;
-  final bool isConfirmed;
+  final bool? isConfirmed;
   final DateTime? confirmationDate;
 
   const NextEventPlayer._({
@@ -24,7 +24,7 @@ final class NextEventPlayer {
   factory NextEventPlayer({
     required String id,
     required String name,
-    required bool isConfirmed,
+    required bool? isConfirmed,
     String? photo,
     String? position,
     DateTime? confirmationDate,
@@ -81,7 +81,7 @@ final class NextEventPlayer {
       name: map['name'] ?? '',
       photo: map['photo'],
       position: map['position'],
-      isConfirmed: map['isConfirmed'] ?? false,
+      isConfirmed: map['isConfirmed'],
       confirmationDate: DateTime.tryParse(map['confirmationDate'] ?? ''),
     );
   }
