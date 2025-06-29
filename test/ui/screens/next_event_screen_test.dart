@@ -48,6 +48,11 @@ class _NextEventScreenState extends State<NextEventScreen> {
                   title: 'CONFIRMED - GOALKEEPERS',
                   players: viewModel.goalkeepers,
                 ),
+              if (viewModel.players.isNotEmpty)
+                PlayerPositionSection(
+                  title: 'CONFIRMED - PLAYERS',
+                  players: viewModel.players,
+                ),
             ],
           );
         },
@@ -91,8 +96,12 @@ final class NextEventPresenterSpy extends Mock implements NextEventPresenter {}
 
 final class NextEventViewModel {
   final List<NextEventPlayerViewModel> goalkeepers;
+  final List<NextEventPlayerViewModel> players;
 
-  const NextEventViewModel({this.goalkeepers = const []});
+  const NextEventViewModel({
+    this.goalkeepers = const [],
+    this.players = const [],
+  });
 }
 
 final class NextEventPlayerViewModel {
@@ -111,16 +120,25 @@ void main() {
     const NextEventPlayerViewModel(name: 'Buffon'),
     const NextEventPlayerViewModel(name: 'Dida'),
   ];
+  final mockPlayers = [
+    const NextEventPlayerViewModel(name: 'Thierry Henry'),
+    const NextEventPlayerViewModel(name: 'Lucas Moura'),
+    const NextEventPlayerViewModel(name: 'Ronaldinho'),
+    const NextEventPlayerViewModel(name: 'Kaká'),
+  ];
 
   registerFallbackValue(const NextEventViewModel());
 
   mockEmitNextEventWith({
     List<NextEventPlayerViewModel> goalkeepers = const [],
+    List<NextEventPlayerViewModel> players = const [],
   }) {
     when(
       () => presenter.emitNextEvent(viewModel: any(named: 'viewModel')),
     ).thenAnswer(
-      (_) => nextEventSubject.add(NextEventViewModel(goalkeepers: goalkeepers)),
+      (_) => nextEventSubject.add(
+        NextEventViewModel(goalkeepers: goalkeepers, players: players),
+      ),
     );
   }
 
@@ -208,5 +226,24 @@ void main() {
     await tester.pump();
 
     expect(find.text('CONFIRMED - GOALKEEPERS'), findsNothing);
+  });
+
+  testWidgets('should display players section', (tester) async {
+    mockEmitNextEventWith(goalkeepers: mockGoalkeepers, players: mockPlayers);
+
+    await tester.pumpWidget(sut);
+    presenter.emitNextEvent(
+      viewModel: NextEventViewModel(
+        goalkeepers: mockGoalkeepers,
+        players: mockPlayers,
+      ),
+    );
+    await tester.pump();
+    expect(find.text('CONFIRMED - PLAYERS'), findsOneWidget);
+    expect(find.text('4'), findsOneWidget);
+    expect(find.text('Thierry Henry'), findsOneWidget);
+    expect(find.text('Lucas Moura'), findsOneWidget);
+    expect(find.text('Ronaldinho'), findsOneWidget);
+    expect(find.text('Kaká'), findsOneWidget);
   });
 }
