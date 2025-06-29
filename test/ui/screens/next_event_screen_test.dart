@@ -53,6 +53,8 @@ class _NextEventScreenState extends State<NextEventScreen> {
                   title: 'CONFIRMED - PLAYERS',
                   players: viewModel.players,
                 ),
+              if (viewModel.out.isNotEmpty)
+                PlayerPositionSection(title: 'OUT', players: viewModel.out),
             ],
           );
         },
@@ -97,10 +99,12 @@ final class NextEventPresenterSpy extends Mock implements NextEventPresenter {}
 final class NextEventViewModel {
   final List<NextEventPlayerViewModel> goalkeepers;
   final List<NextEventPlayerViewModel> players;
+  final List<NextEventPlayerViewModel> out;
 
   const NextEventViewModel({
     this.goalkeepers = const [],
     this.players = const [],
+    this.out = const [],
   });
 }
 
@@ -132,12 +136,17 @@ void main() {
   mockEmitNextEventWith({
     List<NextEventPlayerViewModel> goalkeepers = const [],
     List<NextEventPlayerViewModel> players = const [],
+    List<NextEventPlayerViewModel> out = const [],
   }) {
     when(
       () => presenter.emitNextEvent(viewModel: any(named: 'viewModel')),
     ).thenAnswer(
       (_) => nextEventSubject.add(
-        NextEventViewModel(goalkeepers: goalkeepers, players: players),
+        NextEventViewModel(
+          goalkeepers: goalkeepers,
+          players: players,
+          out: out,
+        ),
       ),
     );
   }
@@ -255,5 +264,19 @@ void main() {
     await tester.pump();
 
     expect(find.text('CONFIRMED - PLAYERS'), findsNothing);
+  });
+
+  testWidgets('should display the OUT section', (tester) async {
+    mockEmitNextEventWith(out: mockPlayers);
+
+    await tester.pumpWidget(sut);
+    presenter.emitNextEvent(viewModel: NextEventViewModel(out: mockPlayers));
+    await tester.pump();
+    expect(find.text('OUT'), findsOneWidget);
+    expect(find.text('4'), findsOneWidget);
+    expect(find.text('Thierry Henry'), findsOneWidget);
+    expect(find.text('Lucas Moura'), findsOneWidget);
+    expect(find.text('Ronaldinho'), findsOneWidget);
+    expect(find.text('Kaká'), findsOneWidget);
   });
 }
