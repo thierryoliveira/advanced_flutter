@@ -279,4 +279,15 @@ void main() {
     expect(find.text('Ronaldinho'), findsOneWidget);
     expect(find.text('Kaká'), findsOneWidget);
   });
+
+  testWidgets(
+    'should hide OUT section when there are not players OUT of the game',
+    (tester) async {
+      await tester.pumpWidget(sut);
+      presenter.emitNextEvent();
+      await tester.pump();
+
+      expect(find.text('OUT'), findsNothing);
+    },
+  );
 }
