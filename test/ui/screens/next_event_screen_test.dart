@@ -310,4 +310,15 @@ void main() {
     expect(find.text('Ronaldinho'), findsOneWidget);
     expect(find.text('Kaká'), findsOneWidget);
   });
+
+  testWidgets(
+    'should hide DOUBT section when there are not players in doubt for the game',
+    (tester) async {
+      await tester.pumpWidget(sut);
+      presenter.emitNextEvent();
+      await tester.pump();
+
+      expect(find.text('DOUBT'), findsNothing);
+    },
+  );
 }
