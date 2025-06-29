@@ -34,20 +34,46 @@ class _NextEventScreenState extends State<NextEventScreen> {
       body: StreamBuilder<NextEventViewModel>(
         stream: widget.presenter.nextEventStream,
         builder: (context, snapshot) {
-          final data = snapshot.data;
+          final viewModel = snapshot.data;
           if (snapshot.connectionState != ConnectionState.active) {
             return const CircularProgressIndicator();
           }
-          if (snapshot.hasError || data == null) return const SizedBox.shrink();
+          if (snapshot.hasError || viewModel == null) {
+            return const SizedBox.shrink();
+          }
           return ListView(
             children: [
-              const Text('CONFIRMED - GOALKEEPERS'),
-              Text(data.goalkeepers.length.toString()),
-              ...data.goalkeepers.map((player) => Text(player.name)),
+              if (viewModel.goalkeepers.isNotEmpty)
+                PlayerPositionSection(
+                  title: 'CONFIRMED - GOALKEEPERS',
+                  players: viewModel.goalkeepers,
+                ),
             ],
           );
         },
       ),
+    );
+  }
+}
+
+class PlayerPositionSection extends StatelessWidget {
+  final String title;
+  final List<NextEventPlayerViewModel> players;
+
+  const PlayerPositionSection({
+    required this.title,
+    required this.players,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(title),
+        Text(players.length.toString()),
+        ...players.map((player) => Text(player.name)),
+      ],
     );
   }
 }
@@ -172,5 +198,15 @@ void main() {
     expect(find.text('Rogerio Ceni'), findsOneWidget);
     expect(find.text('Buffon'), findsOneWidget);
     expect(find.text('Dida'), findsOneWidget);
+  });
+
+  testWidgets('should hide goalkeepers section when there are no goalkeepers', (
+    tester,
+  ) async {
+    await tester.pumpWidget(sut);
+    presenter.emitNextEvent();
+    await tester.pump();
+
+    expect(find.text('CONFIRMED - GOALKEEPERS'), findsNothing);
   });
 }
